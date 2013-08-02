@@ -33,7 +33,7 @@ module.exports = (grunt) ->
     hogan:
       main:
         src: 'src/templates/templates.js'
-        dest: 'src/templates/**/*.mustache'
+        src: 'src/templates/**/*.mustache'
       lib:
         dest: 'lib/templates/templates.js'
         src: 'lib/templates/**/*.mustache'
@@ -48,14 +48,10 @@ module.exports = (grunt) ->
       main:
         files:
           'dist/main.css': 'src/stylesheets/main.less'
-          'dist/demo.css': 'src/stylesheets/demo.less'
     browserify:
-      demo:
-        src: 'src/scripts/demo.coffee'
-        dest: 'dist/demo.js'
-      generic:
-        src: 'src/scripts/generic.coffee'
-        dest: 'dist/generic.js'
+      shipping:
+        src: 'src/scripts/shipping.coffee'
+        dest: 'dist/shipping.js'
       options:
         transform: ['coffeeify']
         debug: true
