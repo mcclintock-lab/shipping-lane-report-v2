@@ -95,7 +95,6 @@ class ShippingLaneReportTab extends ReportTab
       isobathPercentChange: isobathPercentChange
       isobathChangeClass: isobathChangeClass
 
-    console.log @template
     @$el.html @template.render context, @partials
 
     # Shouldn't we give some feedback to the user if the layer isn't present in the layer tree?
@@ -111,7 +110,5 @@ class ShippingLaneReportTab extends ReportTab
   onMoreResultsClick: (e) =>
     e?.preventDefault?()
     $(e.target).closest('.reportSection').removeClass 'collapsed'
-
-console.log ReportTab
 
 module.exports = ShippingLaneReportTab

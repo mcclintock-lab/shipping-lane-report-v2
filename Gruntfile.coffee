@@ -27,7 +27,7 @@ module.exports = (grunt) ->
         ]
         tasks: ['less']
       livereload:
-        files: ['dist/**/*.css']
+        files: ['dist/main.css']
         options:
           livereload: true
     hogan:
