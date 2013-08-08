@@ -1,5 +1,6 @@
 sightingsTemplate = require './sightingsTemplate.coffee'
 ReportTab = require '../../lib/scripts/reportTab.coffee'
+enableLayerTogglers = require '../../lib/scripts/enableLayerTogglers.coffee'
 
 addCommas = (nStr) ->
   nStr += ''
@@ -18,15 +19,18 @@ class ShippingLaneReportTab extends ReportTab
   events:
     "click a[rel=toggle-layer]" : '_handleReportLayerClick'
     "click a.moreResults":        'onMoreResultsClick'
-  dependencies: ['ShippingLaneOverlay']
+  dependencies: ['LaneOverlay']
 
   render: () ->
+    console.log @results
     window.results = @results
-    isobath = @results.results[2]
-    rigs = @results.results[0]
-    whaleSightings = @results.results[1]
+    isobath = @getResult('Habitats')[0]
+    console.log isobath
+    # isobath = @results.results[2]
+    rigs = @getResult('RigsNear')[0]
+    whaleSightings = @getResult('WhaleCount')[0]
     sightings = {}
-    for feature in whaleSightings.value.features
+    for feature in whaleSightings.features
       species = feature.attributes.Species
       unless species in _.keys(sightings)
         sightings[feature.attributes.Species] = 0
@@ -42,10 +46,10 @@ class ShippingLaneReportTab extends ReportTab
         record.percentChange = 0
         record.changeClass = 'nochange'
     area = 0
-    for feature in isobath.value.features
+    for feature in isobath.features
       area = area + feature.attributes.Shape_Area
     rigIntersections = 0
-    for rig in rigs.value.features
+    for rig in rigs.features
       if rig.attributes.NEAR_DIST < 500
         rigIntersections = rigIntersections + 1
     overlapsRig = rigIntersections > 0
@@ -96,6 +100,8 @@ class ShippingLaneReportTab extends ReportTab
       isobathChangeClass: isobathChangeClass
 
     @$el.html @template.render context, @partials
+
+    enableLayerTogglers(@$el)
 
     # Shouldn't we give some feedback to the user if the layer isn't present in the layer tree?
   _handleReportLayerClick: (e) ->
