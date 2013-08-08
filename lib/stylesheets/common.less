@@ -118,6 +118,13 @@
       margin:0;
     }
 
+    p.large {
+      font-size:15px;
+      line-height:19px;
+    }
+
+
+
     table {
       width:100%;
       @bg:#fafafa;
@@ -142,4 +149,25 @@
       }
     }
   }
+
+  a[data-toggle-node] {
+    // color:blue;
+    text-decoration:none;
+    &[data-not-found=true] {
+      color:red;
+    }
+    position:relative;
+    margin-left:16px;
+    &:before {
+      font-family:'fontello';
+      position:absolute;
+      left:-16px;
+      top:0px;
+      content:'';
+    }
+    &[data-visible=true]:before {
+      content: '☑';
+    }
+  }
+
 }
