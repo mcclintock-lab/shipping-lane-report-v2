@@ -22,10 +22,8 @@ class ShippingLaneReportTab extends ReportTab
   dependencies: ['LaneOverlay']
 
   render: () ->
-    console.log @results
     window.results = @results
     isobath = @getResult('Habitats')[0]
-    console.log isobath
     # isobath = @results.results[2]
     rigs = @getResult('RigsNear')[0]
     whaleSightings = @getResult('WhaleCount')[0]
