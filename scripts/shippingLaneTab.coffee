@@ -1,6 +1,10 @@
+ReportTab = require 'reportTab'
+templates = require '../templates/templates.js'
+_partials = require '../node_modules/seasketch-reporting-api/templates/templates.js'
+partials = []
+for key, val of _partials
+  partials[key.replace('node_modules/seasketch-reporting-api/', '')] = val
 sightingsTemplate = require './sightingsTemplate.coffee'
-ReportTab = require '../../lib/scripts/reportTab.coffee'
-enableLayerTogglers = require '../../lib/scripts/enableLayerTogglers.coffee'
 
 addCommas = (nStr) ->
   nStr += ''
@@ -15,7 +19,7 @@ addCommas = (nStr) ->
 class ShippingLaneReportTab extends ReportTab
   name: 'Shipping Lane Report'
   className: 'shippingLaneInfo'
-  template: require('../templates/templates.js').shippingLaneReport
+  template: templates.shippingLaneReport
   events:
     "click a[rel=toggle-layer]" : '_handleReportLayerClick'
     "click a.moreResults":        'onMoreResultsClick'
@@ -23,16 +27,16 @@ class ShippingLaneReportTab extends ReportTab
 
   render: () ->
     window.results = @results
-    isobath = @getResult('Habitats')[0]
+    isobath = @recordSet('LaneOverlay', 'Habitats')
     # isobath = @results.results[2]
-    rigs = @getResult('RigsNear')[0]
-    whaleSightings = @getResult('WhaleCount')[0]
+    rigs = @recordSet('LaneOverlay', 'RigsNear')
+    whaleSightings = @recordSet('LaneOverlay', 'WhaleCount').toArray()
     sightings = {}
-    for feature in whaleSightings.features
-      species = feature.attributes.Species
+    for feature in whaleSightings
+      species = feature.Species
       unless species in _.keys(sightings)
-        sightings[feature.attributes.Species] = 0
-      sightings[species] = sightings[species] + feature.attributes.FREQUENCY
+        sightings[feature.Species] = 0
+      sightings[species] = sightings[species] + feature.FREQUENCY
     sightingsData = _.map sightingsTemplate, (s) -> _.clone(s)
     for record in sightingsData
       record.count = sightings[record.id] if sightings[record.id]
@@ -44,11 +48,11 @@ class ShippingLaneReportTab extends ReportTab
         record.percentChange = 0
         record.changeClass = 'nochange'
     area = 0
-    for feature in isobath.features
-      area = area + feature.attributes.Shape_Area
+    for feature in isobath.toArray()
+      area = area + feature.Shape_Area
     rigIntersections = 0
-    for rig in rigs.features
-      if rig.attributes.NEAR_DIST < 500
+    for rig in rigs.toArray()
+      if rig.NEAR_DIST < 500
         rigIntersections = rigIntersections + 1
     overlapsRig = rigIntersections > 0
     intersectedIsobathM = area / 1000
@@ -99,7 +103,7 @@ class ShippingLaneReportTab extends ReportTab
 
     @$el.html @template.render context, @partials
 
-    enableLayerTogglers(@$el)
+    @enableLayerTogglers(@$el)
 
     # Shouldn't we give some feedback to the user if the layer isn't present in the layer tree?
   _handleReportLayerClick: (e) ->

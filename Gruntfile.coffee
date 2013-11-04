@@ -11,50 +11,60 @@ module.exports = (grunt) ->
           keepalive: true
     watch:
       scripts:
-        files: ['src/scripts/**/*.coffee', 'lib/scripts/**/*.coffee']
+        files: [
+          'scripts/**/*.coffee', 
+          'node_modules/seasketch-reporting-api/scripts/**/*.coffee'
+        ]
         tasks: ['browserify']
       templates:
         files: [
-          'src/templates/**/*.mustache'
-          'lib/templates/**/*.mustache'
+          'templates/**/*.mustache'
+          'node_modules/seasketch-reporting-api/templates/**/*.mustache'
         ]
         tasks: ['hogan', 'browserify']
       stylesheets:
         files: [
-          'src/stylesheets/**/*.less'
+          'stylesheets/**/*.less'
           'node_modules/backbone/less/*'
-          'lib/stylesheets/**/*.less'
+          'node_modules/seasketch-reporting-api/stylesheets/**/*.less'
         ]
         tasks: ['less']
       livereload:
-        files: ['dist/main.css']
+        files: ['dist/**/*.css']
         options:
           livereload: true
     hogan:
       main:
-        dest: 'src/templates/templates.js'
-        src: 'src/templates/**/*.mustache'
+        dest: 'templates/templates.js'
+        src: 'templates/**/*.mustache'
       lib:
-        dest: 'lib/templates/templates.js'
-        src: 'lib/templates/**/*.mustache'
+        dest: 'node_modules/seasketch-reporting-api/templates/templates.js'
+        src: 'node_modules/seasketch-reporting-api/templates/**/*.mustache'
       options:
         commonJsWrapper: true
         defaultName: (filename) -> 
           filename
-            .replace('src/templates/', '')
-            .replace('lib/templates/', '')
+            .replace('templates/', '')
+            .replace('node_modules/seasketch-reporting-api/templates/', '')
             .replace('.mustache', '')
     less:
       main:
         files:
-          'dist/main.css': 'src/stylesheets/main.less'
+          'dist/report.css': 'stylesheets/main.less'
     browserify:
       shipping:
-        src: 'src/scripts/shipping.coffee'
+        src: 'scripts/shipping.coffee'
         dest: 'dist/shipping.js'
       options:
         transform: ['coffeeify']
         debug: true
+        alias: [
+          'node_modules/seasketch-reporting-api/templates/templates.js:api/templates'
+          'node_modules/seasketch-reporting-api/scripts/reportTab.coffee:reportTab'
+          'node_modules/seasketch-reporting-api/scripts/utils.coffee:api/utils'
+        ]
+        ignore: ['views/collectionView']
+
 
   grunt.loadNpmTasks('grunt-contrib-connect')
   grunt.loadNpmTasks('grunt-contrib-watch')
