@@ -62,7 +62,6 @@ class ShippingLaneReportTab extends ReportTab
     isobathPercentChange = Math.round((Math.abs(isobathChange) / existingIsobathIntersection) * 100)
     existingLength = 122.75
     length = @model.get('geometry').features[0].attributes.Shape_Length / 5048
-    window.graphics = @app.projecthomepage.getLayer(@model).getGraphics(@model)
     percentChange = Math.abs(((existingLength - length) / existingLength) * 100)
     lengthIncreased = existingLength - length < 0
     lengthChangeClass = if lengthIncreased then 'positive' else 'negative'
