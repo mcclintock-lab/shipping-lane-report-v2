@@ -23,21 +23,25 @@ class ShippingLaneReportTab extends ReportTab
   events:
     "click a[rel=toggle-layer]" : '_handleReportLayerClick'
     "click a.moreResults":        'onMoreResultsClick'
-  dependencies: ['LaneOverlay']
+  dependencies: ['ShippingLanes']
 
   render: () ->
     window.results = @results
-    isobath = @recordSet('LaneOverlay', 'Habitats')
+    isobath = @recordSet('ShippingLanes', 'Habitats').toArray()[0]
+    console.log(isobath)
     # isobath = @results.results[2]
-    rigs = @recordSet('LaneOverlay', 'RigsNear')
-    whaleSightings = @recordSet('LaneOverlay', 'WhaleCount').toArray()
+    rigs = @recordSet('ShippingLanes', 'RigsNear').toArray()[0]
+    console.log(rigs)
+
+    whaleSightings = @recordSet('ShippingLanes', 'WhaleCount').toArray()
     sightings = {}
     for feature in whaleSightings
       species = feature.Species
       unless species in _.keys(sightings)
         sightings[feature.Species] = 0
-      sightings[species] = sightings[species] + feature.FREQUENCY
+      sightings[species] = sightings[species] + feature.Frequency
     sightingsData = _.map sightingsTemplate, (s) -> _.clone(s)
+
     for record in sightingsData
       record.count = sightings[record.id] if sightings[record.id]
       record.diff = record.count - record.unchangedCount
@@ -47,15 +51,11 @@ class ShippingLaneReportTab extends ReportTab
       if _.isNaN(record.percentChange)
         record.percentChange = 0
         record.changeClass = 'nochange'
-    area = 0
-    for feature in isobath.toArray()
-      area = area + feature.Shape_Area
-    rigIntersections = 0
-    for rig in rigs.toArray()
-      if rig.NEAR_DIST < 500
-        rigIntersections = rigIntersections + 1
+    area = isobath.AREA/1000
+    rigIntersections = rigs.NEAR_DIST
+    console.log("area: ", area)
     overlapsRig = rigIntersections > 0
-    intersectedIsobathM = area / 1000
+    intersectedIsobathM = area 
     existingIsobathIntersection = 54982
     isobathChange = intersectedIsobathM - existingIsobathIntersection
     isobathChangeClass = if isobathChange > 0 then 'positive' else 'negative'
