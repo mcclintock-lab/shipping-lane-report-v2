@@ -28,12 +28,9 @@ class ShippingLaneReportTab extends ReportTab
   render: () ->
     window.results = @results
     isobath = @recordSet('ShippingLanes', 'Habitats').toArray()[0]
-    console.log(isobath)
-    # isobath = @results.results[2]
     rigs = @recordSet('ShippingLanes', 'RigsNear').toArray()[0]
-    console.log(rigs)
-
     whaleSightings = @recordSet('ShippingLanes', 'WhaleCount').toArray()
+
     sightings = {}
     for feature in whaleSightings
       species = feature.Species
@@ -48,23 +45,31 @@ class ShippingLaneReportTab extends ReportTab
       record.percentChange =  Math.round((Math.abs(record.diff)/record.unchangedCount) * 100)
       if record.percentChange is Infinity then record.percentChange = '>100';
       record.changeClass = if record.diff > 0 then 'positive' else 'negative'
-      if _.isNaN(record.percentChange)
+      if _.isNaN(record.percentChange) or record.percentChange == 0.0
         record.percentChange = 0
         record.changeClass = 'nochange'
+
     area = isobath.AREA/1000
     rigIntersections = rigs.NEAR_DIST
-    console.log("area: ", area)
+    
     overlapsRig = rigIntersections > 0
     intersectedIsobathM = area 
     existingIsobathIntersection = 54982
-    isobathChange = intersectedIsobathM - existingIsobathIntersection
+    isobathChange = Math.round(intersectedIsobathM) - existingIsobathIntersection
     isobathChangeClass = if isobathChange > 0 then 'positive' else 'negative'
+    
+    if isobathChange == 0
+      isobathChangeClass = 'nochange'
+
     isobathPercentChange = Math.round((Math.abs(isobathChange) / existingIsobathIntersection) * 100)
-    existingLength = 122.75
-    length = @model.get('geometry').features[0].attributes.Shape_Length / 5048
+    existingLength = 166
+    length = Math.round(isobath.SIDE_LENGTH/1852)
+    console.log("len: ", length)
+
     percentChange = Math.abs(((existingLength - length) / existingLength) * 100)
     lengthIncreased = existingLength - length < 0
     lengthChangeClass = if lengthIncreased then 'positive' else 'negative'
+    console.log("length: ", lengthIncreased)
     if Math.abs(existingLength - length) < 0.01
       lengthChangeClass = 'nochange'
     # from http://www.bren.ucsb.edu/research/documents/whales_report.pdf
